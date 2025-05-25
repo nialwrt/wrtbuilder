@@ -154,10 +154,9 @@ rebuild_menu() {
     echo -e "2) FIRMWARE UPDATE (FAST REBUILD)"
     echo -e "3) CONFIG UPDATE (FAST REBUILD)"
     echo -e "4) EXISTING UPDATE (NO CHANGES)"
-    while true; do
-        echo -ne "${BOLD_BLUE}CHOOSE OPTION: ${RESET}"
-        read -r opt
-        case "$opt" in
+    echo -ne "${BOLD_BLUE}CHOOSE OPTION: ${RESET}"
+    read -r opt
+    case "$opt" in
             1)
                 echo -e "${BOLD_YELLOW}REMOVING EXISTING BUILD DIRECTORY: ${distro}${RESET}"
                 rm -rf "$distro"
