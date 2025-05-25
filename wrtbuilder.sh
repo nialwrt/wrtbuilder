@@ -12,14 +12,15 @@ BOLD_BLUE="${BOLD}${BLUE}"
 BOLD_MAGENTA="${BOLD}${MAGENTA}"
 main_menu() {
     clear
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
-    echo -e "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
-    echo -e "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
-    echo -e "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
-    echo -e "${BOLD_BLUE}SELECT BUILD DISTRO:${RESET}"
-    echo -e "1) IMMORTALWRT"
-    echo -e "2) OPENWRT"
+echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
+echo -e "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
+echo -e "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
+echo -e "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
+echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
+echo -e "1) IMMORTALWRT"
+echo -e "2) OPENWRT"
+echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
+read -r OPTION
     while true; do
         read -r opt
         case "$opt" in
