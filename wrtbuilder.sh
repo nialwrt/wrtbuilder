@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 script_path="$(realpath "$0")"
+
 RESET='\033[0m'
 BOLD='\033[1m'
 RED='\033[31m'; GREEN='\033[32m'; YELLOW='\033[33m'
@@ -10,20 +11,21 @@ BOLD_GREEN="${BOLD}${GREEN}"
 BOLD_YELLOW="${BOLD}${YELLOW}"
 BOLD_BLUE="${BOLD}${BLUE}"
 BOLD_MAGENTA="${BOLD}${MAGENTA}"
+
 main_menu() {
     clear
-echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
-echo -e "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
-echo -e "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
-echo -e "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
-echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
-echo -e "1) IMMORTALWRT"
-echo -e "2) OPENWRT"
-echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
-read -r OPTION
+    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    echo -e "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
+    echo -e "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
+    echo -e "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
+    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    echo -e "1) IMMORTALWRT"
+    echo -e "2) OPENWRT"
+    echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
+    read -r OPTION
+
     while true; do
-        read -r opt
-        case "$opt" in
+        case "$OPTION" in
             1)
                 distro="immortalwrt"
                 repo="https://github.com/immortalwrt/immortalwrt.git"
@@ -38,25 +40,32 @@ read -r OPTION
                 ;;
             *)
                 echo -e "${BOLD_RED}INVALID CHOICE. TRY AGAIN.${RESET}"
+                echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
+                read -r OPTION
                 ;;
         esac
     done
+
     if ! command -v sudo &>/dev/null; then
         SUDO=""
     else
         SUDO="sudo"
     fi
+
     echo -e "${BOLD_YELLOW}UPDATING SYSTEM PACKAGES...${RESET}"
     $SUDO apt update -y && $SUDO apt full-upgrade -y || {
         echo -e "${BOLD_RED}ERROR: SYSTEM UPDATE FAILED.${RESET}"
         exit 1
     }
+
     echo -e "${BOLD_YELLOW}INSTALLING DEPENDENCIES FOR ${distro^^}...${RESET}"
     $SUDO apt install -y "${deps[@]}" || {
         echo -e "${BOLD_RED}ERROR: FAILED TO INSTALL DEPENDENCIES.${RESET}"
         exit 1
     }
+
     echo -e "${BOLD_GREEN}DEPENDENCIES INSTALLED SUCCESSFULLY.${RESET}"
+
     if [ ! -d "$distro" ]; then
         echo -e "${BOLD_YELLOW}CLONING REPO: $repo INTO $distro...${RESET}"
         git clone --depth=1 "$repo" "$distro" || {
@@ -68,6 +77,7 @@ read -r OPTION
         echo -e "${BOLD_GREEN}DIRECTORY '$distro' ALREADY EXISTS. SKIPPING CLONE.${RESET}"
     fi
 }
+
 update_feeds() {
     echo -e "${BOLD_YELLOW}UPDATING FEEDS...${RESET}"
     ./scripts/feeds update -a && ./scripts/feeds install -a || {
@@ -82,6 +92,7 @@ update_feeds() {
     }
     echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY.${RESET}"
 }
+
 select_target() {
     echo -e "${BOLD_BLUE}AVAILABLE BRANCHES:${RESET}"
     git branch -a
@@ -98,11 +109,13 @@ select_target() {
         fi
     done
 }
+
 run_menuconfig() {
     echo -e "${BOLD_YELLOW}RUNNING MENUCONFIG...${RESET}"
     make menuconfig
     echo -e "${BOLD_GREEN}CONFIGURATION SAVED.${RESET}"
 }
+
 get_version() {
     version_tag=$(git describe --tags --exact-match 2>/dev/null || echo "")
     if [ -n "$version_tag" ]; then
@@ -111,6 +124,7 @@ get_version() {
         version_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
     fi
 }
+
 start_build() {
     get_version
     while true; do
@@ -124,7 +138,6 @@ start_build() {
                 $((dur / 3600)) $(((dur % 3600) / 60)) $((dur % 60))
             rm -f -- "$script_path"
             exit 0
-            break
         else
             echo -e "${BOLD_RED}BUILD FAILED. RETRYING WITH VERBOSE OUTPUT...${RESET}"
             make -j1 V=s
@@ -137,6 +150,7 @@ start_build() {
         fi
     done
 }
+
 build_menu() {
     cd "$distro" || exit 1
     update_feeds || exit 1
@@ -144,6 +158,7 @@ build_menu() {
     run_menuconfig
     start_build
 }
+
 rebuild_menu() {
     clear
     echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
@@ -157,49 +172,46 @@ rebuild_menu() {
     echo -ne "${BOLD_BLUE}CHOOSE OPTION: ${RESET}"
     read -r opt
     case "$opt" in
-            1)
-                echo -e "${BOLD_YELLOW}REMOVING EXISTING BUILD DIRECTORY: ${distro}${RESET}"
-                rm -rf "$distro"
-                echo -e "${BOLD_YELLOW}CLONING FRESH FROM REPOSITORY: $repo${RESET}"
-                git clone "$repo" "$distro" || {
+        1)
+            echo -e "${BOLD_YELLOW}REMOVING EXISTING BUILD DIRECTORY: ${distro}${RESET}"
+            rm -rf "$distro"
+            echo -e "${BOLD_YELLOW}CLONING FRESH FROM REPOSITORY: $repo${RESET}"
+            git clone "$repo" "$distro" || {
                 echo -e "${BOLD_RED}ERROR: GIT CLONE FAILED.${RESET}"
                 exit 1
-                }
-                cd "$distro" || exit 1
-                update_feeds || exit 1
-                select_target
-                run_menuconfig
-                start_build
-                break
-                ;;
-            2)
-                echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (MAKE CLEAN)...${RESET}"
-                cd "$distro" || exit 1
-                make clean
-                make defconfig
-                start_build
-                break
-                ;;
-            3)
-                echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (REMOVE CONFIG)...${RESET}"
-                cd "$distro" || exit 1
-                rm -f .config
-                run_menuconfig
-                start_build
-                break
-                ;;
-            4)
-                echo -e "${BOLD_YELLOW}STARTING BUILD WITH EXISTING CONFIGURATION...${RESET}"
-                cd "$distro" || exit 1
-                start_build
-                break
-                ;;
-            *)
-                echo -e "${BOLD_RED}INVALID CHOICE.${RESET}"
-                ;;
-        esac
-    done
+            }
+            cd "$distro" || exit 1
+            update_feeds || exit 1
+            select_target
+            run_menuconfig
+            start_build
+            ;;
+        2)
+            echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (MAKE CLEAN)...${RESET}"
+            cd "$distro" || exit 1
+            make clean
+            make defconfig
+            start_build
+            ;;
+        3)
+            echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (REMOVE CONFIG)...${RESET}"
+            cd "$distro" || exit 1
+            rm -f .config
+            run_menuconfig
+            start_build
+            ;;
+        4)
+            echo -e "${BOLD_YELLOW}STARTING BUILD WITH EXISTING CONFIGURATION...${RESET}"
+            cd "$distro" || exit 1
+            start_build
+            ;;
+        *)
+            echo -e "${BOLD_RED}INVALID CHOICE.${RESET}"
+            return 1
+            ;;
+    esac
 }
+
 main_menu
 if [ -d "$distro" ]; then
     rebuild_menu
