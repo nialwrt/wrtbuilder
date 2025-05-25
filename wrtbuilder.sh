@@ -47,10 +47,10 @@ main_menu() {
         esac
     done
 
-    if ! command -v sudo &>/dev/null; then
-        SUDO=""
-    else
+    if command -v sudo &>/dev/null; then
         SUDO="sudo"
+    else
+        SUDO=""
     fi
 
     echo -e "${BOLD_YELLOW}UPDATING SYSTEM PACKAGES...${RESET}"
