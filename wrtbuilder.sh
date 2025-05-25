@@ -69,7 +69,7 @@ main_menu() {
 
     if [ ! -d "$distro" ]; then
         echo -e "${BOLD_YELLOW}CLONING REPO: $repo INTO $distro...${RESET}"
-        git clone --depth=1 "$repo" "$distro" || {
+        git clone "$repo" "$distro"
             echo -e "${BOLD_RED}GIT CLONE FAILED. EXITING.${RESET}"
             exit 1
         }
