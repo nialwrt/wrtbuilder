@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+
 script_path="$(realpath "$0")"
 
 RESET='\033[0m'
