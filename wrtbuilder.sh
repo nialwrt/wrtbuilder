@@ -12,16 +12,26 @@ BOLD_YELLOW="${BOLD}${YELLOW}"
 BOLD_BLUE="${BOLD}${BLUE}"
 BOLD_MAGENTA="${BOLD}${MAGENTA}"
 
+center() {
+    term_width=$(tput cols)
+    padding=$(( (term_width - ${#1}) / 2 ))
+    printf "%*s%s\n" "$padding" "" "$1"
+}
+
 main_menu() {
     clear
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
-    echo -e "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
-    echo -e "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
-    echo -e "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    echo
+    center "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    center "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
+    center "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
+    center "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
+    center "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    echo
     echo -e "${BOLD_BLUE}BUILD MENU${RESET}"
+    echo
     echo -e "1) IMMORTALWRT"
     echo -e "2) OPENWRT"
+    echo
     echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
     read -r OPTION
 
@@ -53,19 +63,23 @@ main_menu() {
         SUDO="sudo"
     fi
 
+    echo
     echo -e "${BOLD_YELLOW}UPDATING SYSTEM PACKAGES...${RESET}"
     $SUDO apt update -y && $SUDO apt full-upgrade -y || {
         echo -e "${BOLD_RED}ERROR: SYSTEM UPDATE FAILED.${RESET}"
         exit 1
     }
 
+    echo
     echo -e "${BOLD_YELLOW}INSTALLING DEPENDENCIES FOR ${distro^^}...${RESET}"
     $SUDO apt install -y "${deps[@]}" || {
         echo -e "${BOLD_RED}ERROR: FAILED TO INSTALL DEPENDENCIES.${RESET}"
         exit 1
     }
 
+    echo
     echo -e "${BOLD_GREEN}DEPENDENCIES INSTALLED SUCCESSFULLY.${RESET}"
+    echo
 
     if [ ! -d "$distro" ]; then
         echo -e "${BOLD_YELLOW}CLONING REPO: $repo INTO $distro...${RESET}"
@@ -74,17 +88,21 @@ main_menu() {
             exit 1
         }
         echo -e "${BOLD_GREEN}REPO CLONED SUCCESSFULLY.${RESET}"
+        just_cloned=1
     else
         echo -e "${BOLD_GREEN}DIRECTORY '$distro' ALREADY EXISTS. SKIPPING CLONE.${RESET}"
+        just_cloned=0
     fi
 }
 
 update_feeds() {
+    echo
     echo -e "${BOLD_YELLOW}UPDATING FEEDS...${RESET}"
     ./scripts/feeds update -a && ./scripts/feeds install -a || {
         echo -e "${BOLD_RED}ERROR: FEEDS UPDATE FAILED.${RESET}"
         return 1
     }
+    echo
     echo -ne "${BOLD_BLUE}EDIT FEEDS IF NEEDED, THEN PRESS ENTER TO CONTINUE: ${RESET}"
     read
     ./scripts/feeds update -a && ./scripts/feeds install -a || {
@@ -92,13 +110,17 @@ update_feeds() {
         return 1
     }
     echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY.${RESET}"
+    echo
 }
 
 select_target() {
+    echo
     echo -e "${BOLD_BLUE}AVAILABLE BRANCHES:${RESET}"
     git branch -a
+    echo
     echo -e "${BOLD_BLUE}AVAILABLE TAGS:${RESET}"
     git tag | sort -V
+    echo
     while true; do
         echo -ne "${BOLD_BLUE}ENTER BRANCH OR TAG TO CHECKOUT: ${RESET}"
         read -r target_tag
@@ -109,12 +131,15 @@ select_target() {
             echo -e "${BOLD_RED}INVALID BRANCH OR TAG: ${target_tag}${RESET}"
         fi
     done
+    echo
 }
 
 run_menuconfig() {
+    echo
     echo -e "${BOLD_YELLOW}RUNNING MENUCONFIG...${RESET}"
     make menuconfig
     echo -e "${BOLD_GREEN}CONFIGURATION SAVED.${RESET}"
+    echo
 }
 
 get_version() {
@@ -129,19 +154,24 @@ get_version() {
 start_build() {
     get_version
     while true; do
+        echo
         echo -e "${BOLD_YELLOW}STARTING BUILD WITH $(nproc) CORES...${RESET}"
         start=$(date +%s)
         if make -j"$(nproc)"; then
             dur=$(( $(date +%s) - start ))
+            echo
             echo -e "${BOLD_YELLOW}BUILD VERSION: ${version_branch}${version_tag}${RESET}"
             echo -e "${BOLD_BLUE}OUTPUT DIRECTORY: $(pwd)/bin/targets/${RESET}"
             printf "${BOLD_GREEN}BUILD COMPLETED IN %02dh %02dm %02ds${RESET}\n" \
                 $((dur / 3600)) $(((dur % 3600) / 60)) $((dur % 60))
+            echo
             rm -f -- "$script_path"
             exit 0
         else
+            echo
             echo -e "${BOLD_RED}BUILD FAILED. RETRYING WITH VERBOSE OUTPUT...${RESET}"
             make -j1 V=s
+            echo
             echo -ne "${BOLD_RED}PLEASE FIX ERRORS AND PRESS ENTER TO RETRY: ${RESET}"
             read -r
             make distclean
@@ -162,20 +192,25 @@ build_menu() {
 
 rebuild_menu() {
     clear
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
-    echo -e "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
-    echo -e "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
-    echo -e "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    echo
+    center "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    center "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
+    center "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
+    center "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
+    center "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    echo
     echo -e "${BOLD_BLUE}REBUILD MENU${RESET}"
+    echo
     echo -e "1) FIRMWARE & PACKAGE UPDATE (FULL REBUILD)"
     echo -e "2) FIRMWARE UPDATE (FAST REBUILD)"
     echo -e "3) CONFIG UPDATE (FAST REBUILD)"
     echo -e "4) EXISTING UPDATE (NO CHANGES)"
+    echo
     echo -ne "${BOLD_BLUE}CHOOSE OPTION: ${RESET}"
     read -r opt
     case "$opt" in
         1)
+            echo
             echo -e "${BOLD_YELLOW}REMOVING EXISTING BUILD DIRECTORY: ${distro}${RESET}"
             rm -rf "$distro"
             echo -e "${BOLD_YELLOW}CLONING FRESH FROM REPOSITORY: $repo${RESET}"
@@ -190,6 +225,7 @@ rebuild_menu() {
             start_build
             ;;
         2)
+            echo
             echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (MAKE CLEAN)...${RESET}"
             cd "$distro" || exit 1
             make clean
@@ -197,6 +233,7 @@ rebuild_menu() {
             start_build
             ;;
         3)
+            echo
             echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (REMOVE CONFIG)...${RESET}"
             cd "$distro" || exit 1
             rm -f .config
@@ -204,6 +241,7 @@ rebuild_menu() {
             start_build
             ;;
         4)
+            echo
             echo -e "${BOLD_YELLOW}STARTING BUILD WITH EXISTING CONFIGURATION...${RESET}"
             cd "$distro" || exit 1
             start_build
@@ -216,8 +254,9 @@ rebuild_menu() {
 }
 
 main_menu
-if [ -d "$distro" ]; then
-    rebuild_menu
-else
+
+if [ "$just_cloned" = "1" ]; then
     build_menu
+else
+    rebuild_menu
 fi
