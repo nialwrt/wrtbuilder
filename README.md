@@ -5,7 +5,7 @@
 # UNIVERSAL-NIALWRT Firmware Builder
 
 ## Overview
-UNIVERSAL-NIALWRT is a versatile OpenWrt build script offering support for multiple distributions: OpenWrt, and ImmortalWrt. It aims to provide a streamlined and user-friendly experience for building custom firmware.
+WRTBUILDER is a versatile OpenWrt build script offering support for multiple distributions: OpenWrt and ImmortalWrt. It aims to provide a streamlined and user-friendly experience for building custom firmware.
 
 ## Features
 * **Multi-Distribution Support:** Enables building firmware for OpenWrt and ImmortalWrt.
@@ -22,4 +22,4 @@ UNIVERSAL-NIALWRT is a versatile OpenWrt build script offering support for multi
 
 ## Quick Installation
 ```bash
-wget https://raw.githubusercontent.com/nialwrt/UNIVERSAL-NIALWRT/main/universal-nialwrt.sh && chmod +x universal-nialwrt.sh && ./universal-nialwrt.sh
+wget https://raw.githubusercontent.com/nialwrt/wrtbuilder/main/wrtbuilder.sh && chmod +x wrtbuilder.sh && ./wrtbuilder.sh
