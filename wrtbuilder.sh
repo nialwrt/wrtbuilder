@@ -15,11 +15,10 @@ BOLD_MAGENTA="${BOLD}${MAGENTA}"
 
 main_menu() {
     clear
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
-    echo -e "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
-    echo -e "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
-    echo -e "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    echo -e "${BOLD_MAGENTA}##############################################${RESET}"
+    echo -e "${BOLD_MAGENTA}           WRTBUILDER BUILD MENU              ${RESET}"
+    echo -e "${BOLD_MAGENTA}            TELEGRAM: @NIALVPN                ${RESET}"
+    echo -e "${BOLD_MAGENTA}##############################################${RESET}"
     echo -e "${BOLD_BLUE}BUILD MENU${RESET}"
     echo -e "1) IMMORTALWRT"
     echo -e "2) OPENWRT"
@@ -165,11 +164,10 @@ build_menu() {
 
 rebuild_menu() {
     clear
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
-    echo -e "${BOLD_MAGENTA}              WRTBUILDER              ${RESET}"
-    echo -e "${BOLD_MAGENTA}      https://github.com/nialwrt      ${RESET}"
-    echo -e "${BOLD_MAGENTA}         TELEGRAM: @NIALVPN           ${RESET}"
-    echo -e "${BOLD_MAGENTA}--------------------------------------${RESET}"
+    echo -e "${BOLD_MAGENTA}##############################################${RESET}"
+    echo -e "${BOLD_MAGENTA}           WRTBUILDER REBUILD MENU            ${RESET}"
+    echo -e "${BOLD_MAGENTA}            TELEGRAM: @NIALVPN                ${RESET}"
+    echo -e "${BOLD_MAGENTA}##############################################${RESET}"
     echo -e "${BOLD_BLUE}REBUILD MENU${RESET}"
     echo -e "1) FIRMWARE & PACKAGE UPDATE (FULL REBUILD)"
     echo -e "2) FIRMWARE UPDATE (FAST REBUILD)"
