@@ -40,7 +40,7 @@ main_menu() {
                 break
                 ;;
             *)
-                echo -e "${BOLD_RED}INVALID CHOICE. TRY AGAIN.${RESET}"
+                echo -e "${BOLD_RED}INVALID CHOICE. TRY AGAIN${RESET}"
                 echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
                 read -r OPTION
                 ;;
@@ -53,47 +53,47 @@ main_menu() {
         SUDO=""
     fi
 
-    echo -e "${BOLD_YELLOW}UPDATING SYSTEM PACKAGES...${RESET}"
+    echo -e "${BOLD_YELLOW}UPDATING SYSTEM PACKAGES${RESET}"
     $SUDO apt update -y && $SUDO apt full-upgrade -y || {
-        echo -e "${BOLD_RED}ERROR: SYSTEM UPDATE FAILED.${RESET}"
+        echo -e "${BOLD_RED}ERROR: SYSTEM UPDATE FAILED${RESET}"
         exit 1
     }
 
-    echo -e "${BOLD_YELLOW}INSTALLING DEPENDENCIES FOR ${distro^^}...${RESET}"
+    echo -e "${BOLD_YELLOW}INSTALLING DEPENDENCIES FOR ${distro^^}${RESET}"
     $SUDO apt install -y "${deps[@]}" || {
-        echo -e "${BOLD_RED}ERROR: FAILED TO INSTALL DEPENDENCIES.${RESET}"
+        echo -e "${BOLD_RED}ERROR: FAILED TO INSTALL DEPENDENCIES${RESET}"
         exit 1
     }
 
-    echo -e "${BOLD_GREEN}DEPENDENCIES INSTALLED SUCCESSFULLY.${RESET}"
+    echo -e "${BOLD_GREEN}DEPENDENCIES INSTALLED SUCCESSFULLY${RESET}"
 
     if [ ! -d "$distro" ]; then
-        echo -e "${BOLD_YELLOW}CLONING REPO: $repo INTO $distro...${RESET}"
+        echo -e "${BOLD_YELLOW}CLONING REPO: $repo INTO $distro${RESET}"
         git clone "$repo" "$distro" || {
-            echo -e "${BOLD_RED}GIT CLONE FAILED. EXITING.${RESET}"
+            echo -e "${BOLD_RED}GIT CLONE FAILED. EXITING${RESET}"
             exit 1
         }
-        echo -e "${BOLD_GREEN}REPO CLONED SUCCESSFULLY.${RESET}"
+        echo -e "${BOLD_GREEN}REPO CLONED SUCCESSFULLY${RESET}"
         just_cloned=1
     else
-        echo -e "${BOLD_GREEN}DIRECTORY '$distro' ALREADY EXISTS. SKIPPING CLONE.${RESET}"
+        echo -e "${BOLD_GREEN}DIRECTORY '$distro' ALREADY EXISTS. SKIPPING CLONE${RESET}"
         just_cloned=0
     fi
 }
 
 update_feeds() {
-    echo -e "${BOLD_YELLOW}UPDATING FEEDS...${RESET}"
+    echo -e "${BOLD_YELLOW}UPDATING FEEDS${RESET}"
     ./scripts/feeds update -a && ./scripts/feeds install -a || {
-        echo -e "${BOLD_RED}ERROR: FEEDS UPDATE FAILED.${RESET}"
+        echo -e "${BOLD_RED}ERROR: FEEDS UPDATE FAILED${RESET}"
         return 1
     }
     echo -ne "${BOLD_BLUE}EDIT FEEDS IF NEEDED, THEN PRESS ENTER TO CONTINUE: ${RESET}"
     read
     ./scripts/feeds update -a && ./scripts/feeds install -a || {
-        echo -e "${BOLD_RED}ERROR: FEEDS INSTALL FAILED AFTER EDIT.${RESET}"
+        echo -e "${BOLD_RED}ERROR: FEEDS INSTALL FAILED AFTER EDIT${RESET}"
         return 1
     }
-    echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY.${RESET}"
+    echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY${RESET}"
 }
 
 select_target() {
@@ -114,9 +114,9 @@ select_target() {
 }
 
 run_menuconfig() {
-    echo -e "${BOLD_YELLOW}RUNNING MENUCONFIG...${RESET}"
+    echo -e "${BOLD_YELLOW}RUNNING MENUCONFIG${RESET}"
     make menuconfig
-    echo -e "${BOLD_GREEN}CONFIGURATION SAVED.${RESET}"
+    echo -e "${BOLD_GREEN}CONFIGURATION SAVED${RESET}"
 }
 
 get_version() {
@@ -131,7 +131,7 @@ get_version() {
 start_build() {
     get_version
     while true; do
-        echo -e "${BOLD_YELLOW}STARTING BUILD WITH $(nproc) CORES...${RESET}"
+        echo -e "${BOLD_YELLOW}STARTING BUILD WITH $(nproc) CORES${RESET}"
         start=$(date +%s)
         if make -j"$(nproc)"; then
             dur=$(( $(date +%s) - start ))
@@ -142,7 +142,7 @@ start_build() {
             rm -f -- "$script_path"
             exit 0
         else
-            echo -e "${BOLD_RED}BUILD FAILED. RETRYING WITH VERBOSE OUTPUT...${RESET}"
+            echo -e "${BOLD_RED}BUILD FAILED. RETRYING WITH VERBOSE OUTPUT${RESET}"
             make -j1 V=s
             echo -ne "${BOLD_RED}PLEASE FIX ERRORS AND PRESS ENTER TO RETRY: ${RESET}"
             read -r
@@ -181,7 +181,7 @@ rebuild_menu() {
             rm -rf "$distro"
             echo -e "${BOLD_YELLOW}CLONING FRESH FROM REPOSITORY: $repo${RESET}"
             git clone "$repo" "$distro" || {
-                echo -e "${BOLD_RED}ERROR: GIT CLONE FAILED.${RESET}"
+                echo -e "${BOLD_RED}ERROR: GIT CLONE FAILED${RESET}"
                 exit 1
             }
             cd "$distro" || exit 1
@@ -191,26 +191,26 @@ rebuild_menu() {
             start_build
             ;;
         2)
-            echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (MAKE CLEAN)...${RESET}"
+            echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (MAKE CLEAN)${RESET}"
             cd "$distro" || exit 1
             make clean
             make defconfig
             start_build
             ;;
         3)
-            echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (REMOVE CONFIG)...${RESET}"
+            echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (REMOVE CONFIG)${RESET}"
             cd "$distro" || exit 1
             rm -f .config
             run_menuconfig
             start_build
             ;;
         4)
-            echo -e "${BOLD_YELLOW}STARTING BUILD WITH EXISTING CONFIGURATION...${RESET}"
+            echo -e "${BOLD_YELLOW}STARTING BUILD WITH EXISTING CONFIGURATION${RESET}"
             cd "$distro" || exit 1
             start_build
             ;;
         *)
-            echo -e "${BOLD_RED}INVALID CHOICE.${RESET}"
+            echo -e "${BOLD_RED}INVALID CHOICE${RESET}"
             return 1
             ;;
     esac
