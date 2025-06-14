@@ -23,7 +23,7 @@ main_menu() {
     echo -e "${BOLD_BLUE}BUILD MENU${RESET}"
     echo -e "1) IMMORTALWRT"
     echo -e "2) OPENWRT"
-    echo -e "3) OPENWRT-IPQ"
+    echo -e "3) OPENWRT IPQ"
     echo -ne "${BOLD_BLUE}SELECT OPTION [1-3]:${RESET}"
     read -r OPTION
 
