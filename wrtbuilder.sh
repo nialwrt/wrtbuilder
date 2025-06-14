@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-preset_repo="https://github.com/nialwrt/aw1kbuilder.git"
 script_path="$(realpath "$0")"
+config_nss="https://raw.githubusercontent.com/nialwrt/wrtbuilder/main/config-nss.seed"
 
 RESET='\033[0m'; BOLD='\033[1m'
 RED='\033[31m'; GREEN='\033[32m'; YELLOW='\033[33m'
@@ -104,15 +104,14 @@ update_feeds() {
 }
 
 run_menuconfig() {
-    if [[ "$distro" == "openwrt-nss" && -f "nss-setup/config-nss.seed" ]]; then
-        echo -e "${BOLD_YELLOW}USING NSS SEED CONFIGURATION${RESET}"
-        cp nss-setup/config-nss.seed .config
+    if [[ "$distro" == "openwrt-nss" ]]; then
+        echo -e "${BOLD_YELLOW}APPLYING NSS DEFAULT CONFIGURATION${RESET}"
+        wget -O .config "$config_nss"
         make defconfig
         echo -e "${BOLD_GREEN}NSS CONFIGURATION APPLIED FROM SEED${RESET}"
-    else
-        echo -e "${BOLD_YELLOW}RUNNING MENUCONFIG${RESET}"
         make menuconfig
-        echo -e "${BOLD_GREEN}CONFIGURATION SAVED${RESET}"
+    else
+        make menuconfig
     fi
 }
 
