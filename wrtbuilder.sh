@@ -20,7 +20,7 @@ main_menu() {
     echo -e "${BOLD_BLUE}BUILD MENU${RESET}"
     echo -e "1) IMMORTALWRT"
     echo -e "2) OPENWRT"
-    echo -e "3) OPENWRT-NSS"
+    echo -e "3) OPENWRT NSS"
     echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
     read -r OPTION
 
