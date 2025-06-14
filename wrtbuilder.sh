@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+preset_repo="https://github.com/nialwrt/aw1kbuilder.git"
 script_path="$(realpath "$0")"
 
 RESET='\033[0m'; BOLD='\033[1m'
