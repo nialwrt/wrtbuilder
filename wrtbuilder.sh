@@ -70,15 +70,13 @@ main_menu() {
 }
 
 select_target() {
-    echo -e "${BOLD_BLUE}AVAILABLE BRANCH:${RESET}"
+    echo -e "${BOLD_BLUE}AVAILABLE BRANCHES:${RESET}"
     git branch -a
-    echo -e "${BOLD_BLUE}AVAILABLE TAG:${RESET}"
+    echo -e "${BOLD_BLUE}AVAILABLE TAGS:${RESET}"
     git tag | sort -V
-
     while true; do
         echo -ne "${BOLD_BLUE}ENTER BRANCH OR TAG TO CHECKOUT: ${RESET}"
         read -r target_tag
-        target_tag=${target_tag:-master}
         if git checkout "$target_tag" &>/dev/null; then
             echo -e "${BOLD_GREEN}CHECKED OUT TO ${target_tag}${RESET}"
             break
@@ -121,7 +119,11 @@ run_menuconfig() {
 
 get_version() {
     version_tag=$(git describe --tags --exact-match 2>/dev/null || echo "")
-    version_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+    if [ -n "$version_tag" ]; then
+        version_branch=""
+    else
+        version_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+    fi
 }
 
 start_build() {
@@ -135,6 +137,7 @@ start_build() {
             echo -e "${BOLD_BLUE}OUTPUT DIRECTORY: $(pwd)/bin/targets/${RESET}"
             printf "${BOLD_GREEN}BUILD COMPLETED IN %02dh %02dm %02ds${RESET}\n" \
                 $((dur / 3600)) $(((dur % 3600) / 60)) $((dur % 60))
+            rm -f -- "$script_path"
             exit 0
         else
             echo -e "${BOLD_RED}BUILD FAILED. RETRYING WITH VERBOSE OUTPUT${RESET}"
