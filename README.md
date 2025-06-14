@@ -18,4 +18,4 @@
 
 ## Quick Installation
 ```bash
-wget https://raw.githubusercontent.com/nialwrt/wrtbuilder/main/wrtbuilder.sh && chmod +x wrtbuilder.sh && ./wrtbuilder.sh
+wget https://github.com/nialwrt/wrtbuilder.git && chmod +x wrtbuilder.sh && ./wrtbuilder.sh
