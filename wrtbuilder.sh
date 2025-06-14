@@ -68,6 +68,25 @@ main_menu() {
     fi
 }
 
+select_target() {
+    echo -e "${BOLD_BLUE}AVAILABLE BRANCHES:${RESET}"
+    git branch -a
+    echo -e "${BOLD_BLUE}AVAILABLE TAGS:${RESET}"
+    git tag | sort -V
+
+    while true; do
+        echo -ne "${BOLD_BLUE}ENTER BRANCH OR TAG TO CHECKOUT: ${RESET}"
+        read -r target_tag
+        target_tag=${target_tag:-master}
+        if git checkout "$target_tag" &>/dev/null; then
+            echo -e "${BOLD_GREEN}CHECKED OUT TO ${target_tag}${RESET}"
+            break
+        else
+            echo -e "${BOLD_RED}INVALID BRANCH OR TAG: ${target_tag}${RESET}"
+        fi
+    done
+}
+
 update_feeds() {
     echo -e "${BOLD_YELLOW}UPDATING FEEDS${RESET}"
     ./scripts/feeds update -a && ./scripts/feeds install -a || {
@@ -81,25 +100,6 @@ update_feeds() {
         return 1
     }
     echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY${RESET}"
-}
-
-select_target() {
-    echo -e "${BOLD_BLUE}AVAILABLE BRANCHES:${RESET}"
-    git branch -a
-    echo -e "${BOLD_BLUE}AVAILABLE TAGS:${RESET}"
-    git tag | sort -V
-
-    while true; do
-        echo -ne "${BOLD_BLUE}ENTER BRANCH OR TAG TO CHECKOUT [default: master]: ${RESET}"
-        read -r target_tag
-        target_tag=${target_tag:-master}
-        if git checkout "$target_tag" &>/dev/null; then
-            echo -e "${BOLD_GREEN}CHECKED OUT TO ${target_tag}${RESET}"
-            break
-        else
-            echo -e "${BOLD_RED}INVALID BRANCH OR TAG: ${target_tag}${RESET}"
-        fi
-    done
 }
 
 run_menuconfig() {
