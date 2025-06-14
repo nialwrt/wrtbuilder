@@ -70,9 +70,9 @@ main_menu() {
 }
 
 select_target() {
-    echo -e "${BOLD_BLUE}AVAILABLE BRANCHES:${RESET}"
+    echo -e "${BOLD_BLUE}AVAILABLE BRANCH:${RESET}"
     git branch -a
-    echo -e "${BOLD_BLUE}AVAILABLE TAGS:${RESET}"
+    echo -e "${BOLD_BLUE}AVAILABLE TAG:${RESET}"
     git tag | sort -V
 
     while true; do
@@ -109,9 +109,13 @@ run_menuconfig() {
         wget -O .config "$config_nss"
         make defconfig
         echo -e "${BOLD_GREEN}NSS CONFIGURATION APPLIED FROM SEED${RESET}"
+        echo -e "${BOLD_YELLOW}RUNNING MENUCONFIG${RESET}"
         make menuconfig
+        echo -e "${BOLD_GREEN}CONFIGURATION SAVED${RESET}"
     else
+        echo -e "${BOLD_YELLOW}RUNNING MENUCONFIG${RESET}"
         make menuconfig
+        echo -e "${BOLD_GREEN}CONFIGURATION SAVED${RESET}"
     fi
 }
 
