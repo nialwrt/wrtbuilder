@@ -235,6 +235,7 @@ rebuild_menu() {
             return 1
             ;;
     esac
+done
 }
 
 main_menu
