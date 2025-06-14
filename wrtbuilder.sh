@@ -2,13 +2,15 @@
 set -e
 
 script_path="$(realpath "$0")"
-config_nss="https://raw.githubusercontent.com/nialwrt/wrtbuilder/main/config-nss.seed"
 
-RESET='\033[0m'; BOLD='\033[1m'
+RESET='\033[0m'
+BOLD='\033[1m'
 RED='\033[31m'; GREEN='\033[32m'; YELLOW='\033[33m'
-BLUE='\033[34m'; MAGENTA='\033[35m'
-BOLD_RED="${BOLD}${RED}"; BOLD_GREEN="${BOLD}${GREEN}"
-BOLD_YELLOW="${BOLD}${YELLOW}"; BOLD_BLUE="${BOLD}${BLUE}"
+BLUE='\033[34m'; MAGENTA='\033[35m'; CYAN='\033[36m'
+BOLD_RED="${BOLD}${RED}"
+BOLD_GREEN="${BOLD}${GREEN}"
+BOLD_YELLOW="${BOLD}${YELLOW}"
+BOLD_BLUE="${BOLD}${BLUE}"
 BOLD_MAGENTA="${BOLD}${MAGENTA}"
 
 main_menu() {
@@ -20,8 +22,8 @@ main_menu() {
     echo -e "${BOLD_BLUE}BUILD MENU${RESET}"
     echo -e "1) IMMORTALWRT"
     echo -e "2) OPENWRT"
-    echo -e "3) OPENWRT NSS"
-    echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
+    echo -e "3) OPENWRT-IPQ"
+    echo -ne "${BOLD_BLUE}SELECT OPTION [1-3]:${RESET}"
     read -r OPTION
 
     while true; do
@@ -30,37 +32,54 @@ main_menu() {
                 distro="immortalwrt"
                 repo="https://github.com/immortalwrt/immortalwrt.git"
                 deps=(ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd)
-                break ;;
+                break
+                ;;
             2)
                 distro="openwrt"
                 repo="https://github.com/openwrt/openwrt.git"
                 deps=(build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-setuptools rsync swig unzip zlib1g-dev file wget)
-                break ;;
+                break
+                ;;
             3)
-                distro="openwrt-nss"
+                distro="openwrt-ipq"
                 repo="https://github.com/qosmio/openwrt-ipq.git"
                 deps=(build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-setuptools rsync swig unzip zlib1g-dev file wget)
-                break ;;
+                break
+                ;;
             *)
                 echo -e "${BOLD_RED}INVALID CHOICE. TRY AGAIN${RESET}"
-                echo -ne "${BOLD_BLUE}SELECT OPTION:${RESET} "
-                read -r OPTION ;;
+                echo -ne "${BOLD_BLUE}SELECT OPTION [1-3]:${RESET} "
+                read -r OPTION
+                ;;
         esac
     done
 
-    SUDO=$(command -v sudo &>/dev/null && echo "sudo" || echo "")
+    if command -v sudo &>/dev/null; then
+        SUDO="sudo"
+    else
+        SUDO=""
+    fi
 
     echo -e "${BOLD_YELLOW}UPDATING SYSTEM PACKAGES${RESET}"
-    $SUDO apt update -y && $SUDO apt full-upgrade -y
+    $SUDO apt update -y && $SUDO apt full-upgrade -y || {
+        echo -e "${BOLD_RED}ERROR: SYSTEM UPDATE FAILED${RESET}"
+        exit 1
+    }
 
     echo -e "${BOLD_YELLOW}INSTALLING DEPENDENCIES FOR ${distro^^}${RESET}"
-    $SUDO apt install -y "${deps[@]}"
+    $SUDO apt install -y "${deps[@]}" || {
+        echo -e "${BOLD_RED}ERROR: FAILED TO INSTALL DEPENDENCIES${RESET}"
+        exit 1
+    }
 
     echo -e "${BOLD_GREEN}DEPENDENCIES INSTALLED SUCCESSFULLY${RESET}"
 
     if [ ! -d "$distro" ]; then
         echo -e "${BOLD_YELLOW}CLONING REPO: $repo INTO $distro${RESET}"
-        git clone "$repo" "$distro"
+        git clone "$repo" "$distro" || {
+            echo -e "${BOLD_RED}GIT CLONE FAILED. EXITING${RESET}"
+            exit 1
+        }
         echo -e "${BOLD_GREEN}REPO CLONED SUCCESSFULLY${RESET}"
         just_cloned=1
     else
@@ -102,7 +121,7 @@ select_target() {
 }
 
 run_menuconfig() {
-    if [[ "$distro" == "openwrt-nss" ]]; then
+    if [[ "$distro" == "openwrt-ipq" ]]; then
         echo -e "${BOLD_YELLOW}APPLYING NSS DEFAULT CONFIGURATION${RESET}"
         wget -O .config "$config_nss"
         make defconfig
@@ -164,20 +183,26 @@ rebuild_menu() {
     clear
     echo -e "${BOLD_MAGENTA}##############################################${RESET}"
     echo -e "${BOLD_MAGENTA}           WRTBUILDER REBUILD MENU            ${RESET}"
+    echo -e "${BOLD_MAGENTA}            TELEGRAM: @NIALVPN                ${RESET}"
     echo -e "${BOLD_MAGENTA}##############################################${RESET}"
     echo -e "${BOLD_BLUE}REBUILD MENU${RESET}"
     echo -e "1) FIRMWARE & PACKAGE UPDATE (FULL REBUILD)"
     echo -e "2) FIRMWARE UPDATE (FAST REBUILD)"
     echo -e "3) CONFIG UPDATE (FAST REBUILD)"
     echo -e "4) EXISTING UPDATE (NO CHANGES)"
-    echo -ne "${BOLD_BLUE}CHOOSE OPTION: ${RESET}"
-    read -r opt
-    case "$opt" in
-        1)
+    echo -ne "${BOLD_BLUE}SELECT OPTION [1-4]:${RESET}"
+    read -r OPTION
+
+    while true; do
+        case "$OPTION" in
+        1)  echo -e "${BOLD_YELLOW}FIRMWARE & PACKAGE UPDATE (FULL REBUILD)${RESET}"
             echo -e "${BOLD_YELLOW}REMOVING EXISTING BUILD DIRECTORY: ${distro}${RESET}"
             rm -rf "$distro"
             echo -e "${BOLD_YELLOW}CLONING FRESH FROM REPOSITORY: $repo${RESET}"
-            git clone "$repo" "$distro"
+            git clone "$repo" "$distro" || {
+                echo -e "${BOLD_RED}ERROR: GIT CLONE FAILED${RESET}"
+                exit 1
+            }
             cd "$distro" || exit 1
             update_feeds || exit 1
             select_target
@@ -185,21 +210,22 @@ rebuild_menu() {
             start_build
             ;;
         2)
-            echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (MAKE CLEAN)${RESET}"
+            echo -e "${BOLD_YELLOW}FIRMWARE UPDATE (FAST REBUILD)${RESET}"
             cd "$distro" || exit 1
             make clean
             make defconfig
+            select_target
             start_build
             ;;
         3)
-            echo -e "${BOLD_YELLOW}PERFORMING FAST REBUILD (REMOVE CONFIG)${RESET}"
+            echo -e "${BOLD_YELLOW}CONFIG UPDATE (FAST REBUILD)${RESET}"
             cd "$distro" || exit 1
             rm -f .config
             run_menuconfig
             start_build
             ;;
         4)
-            echo -e "${BOLD_YELLOW}STARTING BUILD WITH EXISTING CONFIGURATION${RESET}"
+            echo -e "${BOLD_YELLOW}EXISTING UPDATE (NO CHANGES)${RESET}"
             cd "$distro" || exit 1
             start_build
             ;;
