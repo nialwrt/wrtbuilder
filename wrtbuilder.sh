@@ -2,6 +2,7 @@
 set -e
 
 script_path="$(realpath "$0")"
+config_nss="https://github.com/nialwrt/aw1kbuilder.git"
 
 RESET='\033[0m'
 BOLD='\033[1m'
