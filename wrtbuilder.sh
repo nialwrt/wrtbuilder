@@ -2,7 +2,7 @@
 set -e
 
 script_path="$(realpath "$0")"
-config_nss="https://raw.githubusercontent.com/nialwrt/wrtbuilder/refs/heads/main/config-nss.seed"
+config_nss="https://raw.githubusercontent.com/nialwrt/wrtbuilder/main/config-nss.seed"
 
 RESET='\033[0m'
 BOLD='\033[1m'
