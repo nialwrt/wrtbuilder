@@ -69,6 +69,21 @@ main_menu() {
     fi
 }
 
+update_feeds() {
+    echo -e "${BOLD_YELLOW}UPDATING FEEDS${RESET}"
+    ./scripts/feeds update -a && ./scripts/feeds install -a || {
+        echo -e "${BOLD_RED}ERROR: FEEDS UPDATE FAILED${RESET}"
+        return 1
+    }
+    echo -ne "${BOLD_BLUE}EDIT FEEDS IF NEEDED, THEN PRESS ENTER TO CONTINUE: ${RESET}"
+    read
+    ./scripts/feeds update -a && ./scripts/feeds install -a || {
+        echo -e "${BOLD_RED}ERROR: FEEDS INSTALL FAILED AFTER EDIT${RESET}"
+        return 1
+    }
+    echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY${RESET}"
+}
+
 select_target() {
     echo -e "${BOLD_BLUE}AVAILABLE BRANCHES:${RESET}"
     git branch -a
@@ -84,21 +99,6 @@ select_target() {
             echo -e "${BOLD_RED}INVALID BRANCH OR TAG: ${target_tag}${RESET}"
         fi
     done
-}
-
-update_feeds() {
-    echo -e "${BOLD_YELLOW}UPDATING FEEDS${RESET}"
-    ./scripts/feeds update -a && ./scripts/feeds install -a || {
-        echo -e "${BOLD_RED}ERROR: FEEDS UPDATE FAILED${RESET}"
-        return 1
-    }
-    echo -ne "${BOLD_BLUE}EDIT FEEDS IF NEEDED, THEN PRESS ENTER TO CONTINUE: ${RESET}"
-    read
-    ./scripts/feeds update -a && ./scripts/feeds install -a || {
-        echo -e "${BOLD_RED}ERROR: FEEDS INSTALL FAILED AFTER EDIT${RESET}"
-        return 1
-    }
-    echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY${RESET}"
 }
 
 run_menuconfig() {
@@ -154,8 +154,8 @@ start_build() {
 
 build_menu() {
     cd "$distro" || exit 1
-    select_target
     update_feeds || exit 1
+    select_target
     run_menuconfig
     start_build
 }
@@ -179,8 +179,8 @@ rebuild_menu() {
             echo -e "${BOLD_YELLOW}CLONING FRESH FROM REPOSITORY: $repo${RESET}"
             git clone "$repo" "$distro"
             cd "$distro" || exit 1
-            select_target
             update_feeds || exit 1
+            select_target
             run_menuconfig
             start_build
             ;;
