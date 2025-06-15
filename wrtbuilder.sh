@@ -148,10 +148,10 @@ get_version() {
 
 start_build() {
     get_version
-    echo -e "${BOLD_YELLOW}DOWNLOADING PACKAGE BEFORE COMPILES${RESET}"
+    echo -e "${BOLD_YELLOW}DOWNLOADING PACKAGES BEFORE COMPILATION${RESET}"
     make download -j"$(nproc)"
     while true; do
-        echo -e "${BOLD_YELLOW}STARTING BUILD WITH $(nproc) CORES${RESET}"
+        echo -e "${BOLD_YELLOW}STARTING BUILD USING $(nproc) CORES${RESET}"
         start=$(date +%s)
         if make -j"$(nproc)"; then
             dur=$(( $(date +%s) - start ))
@@ -161,9 +161,9 @@ start_build() {
                 $((dur / 3600)) $(((dur % 3600) / 60)) $((dur % 60))
             exit 0
         else
-            echo -e "${BOLD_RED}BUILD FAILED. RETRYING WITH VERBOSE OUTPUT${RESET}"
+            echo -e "${BOLD_RED}BUILD FAILED. RETRYING WITH VERBOSE OUTPUT...${RESET}"
             make -j1 V=s
-            echo -ne "${BOLD_RED}PLEASE FIX ERRORS AND PRESS ENTER TO RETRY: ${RESET}"
+            echo -ne "${BOLD_RED}PLEASE FIX ERRORS, THEN PRESS ENTER TO RETRY: ${RESET}"
             read -r
             make distclean
             update_feeds || return 1
