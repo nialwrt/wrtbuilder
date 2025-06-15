@@ -23,8 +23,9 @@ main_menu() {
     echo -e "${BOLD_BLUE}BUILD MENU${RESET}"
     echo -e "1) IMMORTALWRT"
     echo -e "2) OPENWRT"
-    echo -e "3) OPENWRT NSS"
-    echo -ne "${BOLD_BLUE}SELECT OPTION [1-3]:${RESET}"
+    echo -e "3) IMMORTALWRT-NSS"
+    echo -e "4) OPENWRT-NSS"
+    echo -ne "${BOLD_BLUE}SELECT OPTION [1-4]:${RESET}"
     read -r OPTION
 
     while true; do
@@ -42,14 +43,20 @@ main_menu() {
                 break
                 ;;
             3)
-                distro="openwrt-ipq"
+                distro="immortalwrt-nss"
+                repo="https://github.com/Gaojianli/immortalwrt-ipq.git"
+                deps=(build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-setuptools rsync swig unzip zlib1g-dev file wget)
+                break
+                ;;
+            4)
+                distro="openwrt-nss"
                 repo="https://github.com/qosmio/openwrt-ipq.git"
                 deps=(build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-setuptools rsync swig unzip zlib1g-dev file wget)
                 break
                 ;;
             *)
-                echo -e "${BOLD_RED}INVALID CHOICE. TRY AGAIN${RESET}"
-                echo -ne "${BOLD_BLUE}SELECT OPTION [1-3]:${RESET} "
+                echo -e "${BOLD_RED}INVALID OPTION. TRY AGAIN${RESET}"
+                echo -ne "${BOLD_BLUE}SELECT OPTION [1-4]:${RESET}"
                 read -r OPTION
                 ;;
         esac
@@ -122,7 +129,7 @@ select_target() {
 }
 
 run_menuconfig() {
-    if [[ "$distro" == "openwrt-ipq" ]]; then
+    if [[ "$distro" == "openwrt-nss" || "$distro" == "immortalwrt-nss" ]]; then
         echo -e "${BOLD_YELLOW}APPLYING NSS DEFAULT CONFIGURATION${RESET}"
         wget -O .config "$config_nss"
         make defconfig
@@ -231,8 +238,9 @@ rebuild_menu() {
             start_build
             ;;
         *)
-            echo -e "${BOLD_RED}INVALID CHOICE${RESET}"
-            return 1
+            echo -e "${BOLD_RED}INVALID OPTION. TRY AGAIN${RESET}"
+            echo -ne "${BOLD_BLUE}SELECT OPTION [1-4]:${RESET}"
+            read -r OPTION
             ;;
     esac
 done
