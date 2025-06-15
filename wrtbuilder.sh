@@ -89,6 +89,21 @@ main_menu() {
     fi
 }
 
+update_feeds() {
+    echo -e "${BOLD_YELLOW}UPDATING FEEDS${RESET}"
+    ./scripts/feeds update -a && ./scripts/feeds install -a || {
+        echo -e "${BOLD_RED}ERROR: FEEDS UPDATE FAILED${RESET}"
+        return 1
+    }
+    echo -ne "${BOLD_BLUE}EDIT FEEDS IF NEEDED, THEN PRESS ENTER TO CONTINUE: ${RESET}"
+    read
+    ./scripts/feeds update -a && ./scripts/feeds install -a || {
+        echo -e "${BOLD_RED}ERROR: FEEDS INSTALL FAILED AFTER EDIT${RESET}"
+        return 1
+    }
+    echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY${RESET}"
+}
+
 select_target() {
     echo -e "${BOLD_BLUE}AVAILABLE BRANCHES:${RESET}"
     git branch -a
@@ -104,21 +119,6 @@ select_target() {
             echo -e "${BOLD_RED}INVALID BRANCH OR TAG: ${target_tag}${RESET}"
         fi
     done
-}
-
-update_feeds() {
-    echo -e "${BOLD_YELLOW}UPDATING FEEDS${RESET}"
-    ./scripts/feeds update -a && ./scripts/feeds install -a || {
-        echo -e "${BOLD_RED}ERROR: FEEDS UPDATE FAILED${RESET}"
-        return 1
-    }
-    echo -ne "${BOLD_BLUE}EDIT FEEDS IF NEEDED, THEN PRESS ENTER TO CONTINUE: ${RESET}"
-    read
-    ./scripts/feeds update -a && ./scripts/feeds install -a || {
-        echo -e "${BOLD_RED}ERROR: FEEDS INSTALL FAILED AFTER EDIT${RESET}"
-        return 1
-    }
-    echo -e "${BOLD_GREEN}FEEDS UPDATED SUCCESSFULLY${RESET}"
 }
 
 run_menuconfig() {
@@ -148,6 +148,8 @@ get_version() {
 
 start_build() {
     get_version
+    echo -e "${BOLD_YELLOW}DOWNLOADING PACKAGE BEFORE COMPILES${RESET}"
+    make download -j"$(nproc)"
     while true; do
         echo -e "${BOLD_YELLOW}STARTING BUILD WITH $(nproc) CORES${RESET}"
         start=$(date +%s)
@@ -157,7 +159,6 @@ start_build() {
             echo -e "${BOLD_BLUE}OUTPUT DIRECTORY: $(pwd)/bin/targets/${RESET}"
             printf "${BOLD_GREEN}BUILD COMPLETED IN %02dh %02dm %02ds${RESET}\n" \
                 $((dur / 3600)) $(((dur % 3600) / 60)) $((dur % 60))
-            rm -f -- "$script_path"
             exit 0
         else
             echo -e "${BOLD_RED}BUILD FAILED. RETRYING WITH VERBOSE OUTPUT${RESET}"
@@ -174,8 +175,8 @@ start_build() {
 
 build_menu() {
     cd "$distro" || exit 1
-    select_target
     update_feeds || exit 1
+    select_target
     run_menuconfig
     start_build
 }
@@ -205,8 +206,8 @@ rebuild_menu() {
                 exit 1
             }
             cd "$distro" || exit 1
-            select_target
             update_feeds || exit 1
+            select_target
             run_menuconfig
             start_build
             ;;
@@ -214,7 +215,6 @@ rebuild_menu() {
             echo -e "${BOLD_YELLOW}FIRMWARE UPDATE (FAST REBUILD)${RESET}"
             cd "$distro" || exit 1
             select_target
-            make clean
             make defconfig
             start_build
             ;;
