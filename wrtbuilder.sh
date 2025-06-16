@@ -21,10 +21,10 @@ main_menu() {
     echo -e "${BOLD_MAGENTA}            TELEGRAM: @NIALVPN                ${RESET}"
     echo -e "${BOLD_MAGENTA}##############################################${RESET}"
     echo -e "${BOLD_BLUE}BUILD MENU${RESET}"
-    echo -e "1) IMMORTALWRT-OFFICIAL"
-    echo -e "2) OPENWRT-OFFICIAL"
-    echo -e "3) IMMORTALWRT-NSS"
-    echo -e "4) OPENWRT-NSS"
+    echo -e "1) IMMORTALWRT OFFICIAL"
+    echo -e "2) OPENWRT OFFICIAL"
+    echo -e "3) IMMORTALWRT NSS"
+    echo -e "4) OPENWRT NSS"
     echo -ne "${BOLD_BLUE}SELECT OPTION [1-4]:${RESET}"
     read -r OPTION
 
