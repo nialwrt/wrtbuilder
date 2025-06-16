@@ -21,23 +21,23 @@ main_menu() {
     echo -e "${BOLD_MAGENTA}            TELEGRAM: @NIALVPN                ${RESET}"
     echo -e "${BOLD_MAGENTA}##############################################${RESET}"
     echo -e "${BOLD_BLUE}BUILD MENU${RESET}"
-    echo -e "1) IMMORTALWRT OFFICIAL"
-    echo -e "2) OPENWRT OFFICIAL"
-    echo -e "3) IMMORTALWRT NSS"
-    echo -e "4) OPENWRT NSS"
+    echo -e "1) IMMORTALWRT-OFFICIAL"
+    echo -e "2) OPENWRT-OFFICIAL"
+    echo -e "3) IMMORTALWRT-NSS"
+    echo -e "4) OPENWRT-NSS"
     echo -ne "${BOLD_BLUE}SELECT OPTION [1-4]:${RESET}"
     read -r OPTION
 
     while true; do
         case "$OPTION" in
             1)
-                distro="immortalwrt"
+                distro="immortalwrt-official"
                 repo="https://github.com/immortalwrt/immortalwrt.git"
                 deps=(ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd)
                 break
                 ;;
             2)
-                distro="openwrt"
+                distro="openwrt-official"
                 repo="https://github.com/openwrt/openwrt.git"
                 deps=(build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev python3-setuptools rsync swig unzip zlib1g-dev file wget)
                 break
